@@ -17,11 +17,6 @@ class DeepSpeedTrain(object):
             conf = yaml.safe_load(f)
         return conf
 
-    def build_json_conf(self, conf_path):
-        with open(conf_path, 'r') as f:
-            conf = json.loads(f)
-        return conf
-
     def build_model(self):
         if self.model_conf.get('model_type') == 'ConformerCTC':
             from model.model import ConformerCTC as Conformer

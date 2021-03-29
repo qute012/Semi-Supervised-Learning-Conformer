@@ -14,8 +14,6 @@ class ConformerCTC(nn.Module):
             kernel_size=32,
             conv_expansion_factor=2,
             ffn_expansion_factor=4,
-            decoder_dim=640,
-            dec_layers=1,
             dropout_p=0.1,
             pad_id=0,
             eos_id=1,
@@ -44,6 +42,8 @@ class ConformerCTC(nn.Module):
 
     def forward(self, inputs, input_length, target):
         enc_state, input_length = self.encoder(inputs, input_length)
+
+        return enc_state, input_length
 
 
 class ConformerTransducer(nn.Module):
@@ -87,6 +87,10 @@ class ConformerTransducer(nn.Module):
             size_average=True,
             blank_label=pad_id
         )
+
+        self.pad_id = pad_id
+        self.eos_id = eos_id
+        self.sos_id = sos_id
 
     def forward(self, inputs, input_length, target):
         enc_state, input_length = self.encoder(inputs, input_length)
