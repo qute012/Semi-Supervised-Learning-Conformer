@@ -53,6 +53,7 @@ class ConformerBlock(nn.Module):
     def __init__(
             self,
             hidden_dim,
+            num_heads,
             dropout_p=0.1
     ):
         super(ConformerBlock, self).__init__()
@@ -63,7 +64,7 @@ class ConformerBlock(nn.Module):
             ),
             Residual(
                 nn.LayerNorm(hidden_dim),
-                RelPositionMultiHeadAttention,
+                RelPositionMultiHeadAttention(hidden_dim, num_heads),
                 nn.Dropout(dropout_p)
             ),
             Residual(
@@ -74,5 +75,8 @@ class ConformerBlock(nn.Module):
             ),
             nn.LayerNorm(hidden_dim)
         )
+
+    def forward(self, x):
+        return self.layers(x)
 
 
