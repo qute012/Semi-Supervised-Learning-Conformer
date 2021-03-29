@@ -1,3 +1,4 @@
+import torch
 import torch.nn as nn
 
 from encoder import ConformerEncoder
@@ -15,8 +16,7 @@ class ConformerCTC(nn.Module):
             conv_expansion_factor=2,
             ffn_expansion_factor=4,
             dropout_p=0.1,
-            pad_id=0,
-            eos_id=1,
+            pad_id=0
     ):
         super().__init__()
         self.encoder = ConformerEncoder(
@@ -31,7 +31,6 @@ class ConformerCTC(nn.Module):
         )
 
         self.pad_id = pad_id
-        self.eos_id = eos_id
 
         self.criterion = nn.CTCLoss(
             blank=pad_id,
@@ -39,12 +38,15 @@ class ConformerCTC(nn.Module):
             zero_infinity=True
         )
 
-
-    def forward(self, inputs, input_length, target):
+    def forward(self, inputs, input_length, target, target_length):
         enc_state, input_length = self.encoder(inputs, input_length)
+
+        self.criterion(enc_state.log_softmax(2), input_length, target, target_length)
 
         return enc_state, input_length
 
+    def recognize(self):
+        pass
 
 class ConformerTransducer(nn.Module):
     def __init__(
@@ -95,3 +97,11 @@ class ConformerTransducer(nn.Module):
     def forward(self, inputs, input_length, target):
         enc_state, input_length = self.encoder(inputs, input_length)
 
+    def recognize(self):
+        pass
+
+    def add_sos_eos(self, inputs):
+        padded_sos = torch.zeros(inputs.size(0), 1).fill_(self.sos_id)
+        padded_eos = torch.zeros(inputs.size(0), 1).fill_(self.eos_id)
+        inputs = torch.cat((padded_sos, inputs, padded_eos), dim=1)
+        return inputs
