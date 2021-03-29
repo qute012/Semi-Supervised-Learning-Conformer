@@ -1,4 +1,5 @@
 import torch.nn as nn
+
 from activation import GLU, Swish
 
 class PointwiseConv(nn.Module):
@@ -67,4 +68,4 @@ class ConvolutionModule(nn.Module):
         )
 
     def forward(self, x):
-        return self.modules(x)
+        return x + self.modules(x)

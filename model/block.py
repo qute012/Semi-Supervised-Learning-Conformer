@@ -1,4 +1,3 @@
-import torch
 import torch.nn as nn
 
 class ConformerBlock(nn.Module):
@@ -7,4 +6,3 @@ class ConformerBlock(nn.Module):
 
     ):
         super(ConformerBlock, self).__init__()
-        
