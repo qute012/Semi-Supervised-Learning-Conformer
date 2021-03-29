@@ -40,13 +40,12 @@ class ConformerCTC(nn.Module):
 
     def forward(self, inputs, input_length, target, target_length):
         enc_state, input_length = self.encoder(inputs, input_length)
-
-        self.criterion(enc_state.log_softmax(2), input_length, target, target_length)
-
-        return enc_state, input_length
+        loss = self.criterion(enc_state.log_softmax(2), input_length, target, target_length)
+        return loss, enc_state, input_length
 
     def recognize(self):
         pass
+
 
 class ConformerTransducer(nn.Module):
     def __init__(
