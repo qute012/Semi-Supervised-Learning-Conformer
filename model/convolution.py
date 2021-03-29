@@ -2,6 +2,7 @@ import torch.nn as nn
 
 from activation import GLU, Swish
 
+
 class PointwiseConv(nn.Module):
     def __init__(
             self,
@@ -14,6 +15,7 @@ class PointwiseConv(nn.Module):
     def forward(self, x):
         x = self.conv(x)
         return x
+
 
 class DepthwiseConv1d(nn.Module):
     def __init__(
@@ -30,6 +32,7 @@ class DepthwiseConv1d(nn.Module):
         x = self.conv(x)
         return x
 
+
 class Transpose(nn.Module):
     def __init__(
             self,
@@ -42,6 +45,7 @@ class Transpose(nn.Module):
 
     def forward(self, x):
         return x.transpose(self.dim0, self.dim1).contiguous()
+
 
 class ConvolutionModule(nn.Module):
     def __init__(

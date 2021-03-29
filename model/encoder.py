@@ -3,6 +3,7 @@ import torch.nn as nn
 from sub_sample import SubSampling
 from block import ConformerBlock
 
+
 class ConformerEncoder(nn.Module):
     def __init__(
             self,

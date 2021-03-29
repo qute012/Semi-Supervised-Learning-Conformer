@@ -2,6 +2,7 @@ import math
 import torch
 import torch.nn as nn
 
+
 class MultiHeadAttention(nn.Module):
     def __init__(
             self,
@@ -45,6 +46,7 @@ class MultiHeadAttention(nn.Module):
         q,k,v = self.forward_qkv(q, k, v)
         scores = torch.matmul(q,k.transpose(-2,-1)) / math.sqrt(self.d_k)
         return self.forward_attention(v, scores, mask)
+
 
 class RelPositionMultiHeadAttention(MultiHeadAttention):
     def __init__(

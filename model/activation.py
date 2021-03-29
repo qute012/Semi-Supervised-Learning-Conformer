@@ -1,5 +1,6 @@
 import torch.nn as nn
 
+
 class GLU(nn.Module):
     def __init__(self, dim):
         super().__init__()
@@ -8,6 +9,7 @@ class GLU(nn.Module):
     def forward(self, x):
         out, gate = x.chunk(2, dim=self.dim)
         return out * gate.sigmoid()
+
 
 class Swish(nn.Module):
     def forward(self, x):

@@ -4,6 +4,7 @@ from activation import Swish
 from attention import RelPositionMultiHeadAttention
 from convolution import ConvolutionModule
 
+
 class FeedForwardModule(nn.Module):
     def __init__(
             self,
@@ -25,7 +26,8 @@ class FeedForwardModule(nn.Module):
         )
 
     def forward(self, x):
-        return x + self.layers(x)
+        return self.layers(x)
+
 
 class Residual(nn.Module):
     def __init__(
@@ -36,6 +38,7 @@ class Residual(nn.Module):
 
     def forward(self, x):
         return x + self.layers(x)
+
 
 class Scale(nn.Module):
     def __init__(
@@ -48,6 +51,7 @@ class Scale(nn.Module):
 
     def forward(self, x):
         return self.layers(x) * self.scale
+
 
 class ConformerBlock(nn.Module):
     def __init__(
@@ -81,5 +85,3 @@ class ConformerBlock(nn.Module):
 
     def forward(self, x):
         return self.layers(x)
-
-

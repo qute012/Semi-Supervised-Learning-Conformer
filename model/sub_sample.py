@@ -1,5 +1,6 @@
 import torch.nn as nn
 
+
 class SubSampling(nn.Module):
     def __init__(
             self,
@@ -15,8 +16,8 @@ class SubSampling(nn.Module):
             nn.SiLU()
         )
 
-        #0 padding, (I-K+K*S)//S
-        subsample_size = out_dim * (((in_dim-1)//2-1)//2)
+        # 0 padding, (I-K+K*S)//S
+        subsample_size = out_dim * (((in_dim - 1) // 2 - 1) // 2)
         self.w = nn.Sequential(
             nn.Linear(subsample_size, out_dim),
             nn.Dropout(dropout_p)
@@ -25,6 +26,6 @@ class SubSampling(nn.Module):
     def forward(self, x):
         x = x.unsqueeze(1)
         x = self.conv(x)
-        B,C,T,F = x.shape
-        x = self.w(x.transpose(1,2).view(B,T,C*F))
+        B, C, T, F = x.shape
+        x = self.w(x.transpose(1, 2).view(B, T, C * F))
         return x
