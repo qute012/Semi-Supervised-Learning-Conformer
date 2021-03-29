@@ -8,6 +8,12 @@ class SubSampling(nn.Module):
             out_dim,
             dropout_p=0.1,
     ):
+        """
+        2d convolution subSampling reduces the length of the sample.
+        :param in_dim: mel-spectrogram dimension.
+        :param out_dim: conformer hidden dimension.
+        :param dropout_p: dropout prob.
+        """
         super(SubSampling, self).__init__()
         self.conv = nn.Sequential(
             nn.Conv2d(1, out_dim, 3, 2),
