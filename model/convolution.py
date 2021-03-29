@@ -41,7 +41,7 @@ class Transpose(nn.Module):
         self.dim1 = dim1
 
     def forward(self, x):
-        return x.transpose(self.dim0, self.dim1)
+        return x.transpose(self.dim0, self.dim1).contiguous()
 
 class ConvolutionModule(nn.Module):
     def __init__(
