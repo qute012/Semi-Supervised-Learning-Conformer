@@ -5,7 +5,7 @@ import json
 class DeepSpeedTrain(object):
     def __init__(self, args):
         self.model_conf = self.build_model(args.model_conf)
-        self.train_conf = self.build_json_conf(args.train_conf)
+        self.train_conf = args.train_conf
         self.model = self.build_model()
         self.build_engine()
 
@@ -29,7 +29,11 @@ class DeepSpeedTrain(object):
         return model
 
     def build_engine(self):
-        self.model, self.optimizer
+        self.model, self.optimizer, _, _ = ds.initialize(
+            args=self.train_conf,
+            model=self.model,
+            model_parameters=self.model.parameters()
+        )
 
     def run(self):
         pass
