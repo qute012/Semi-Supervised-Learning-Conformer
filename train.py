@@ -22,8 +22,7 @@ def main():
     )
 
     args = parser.parse_args()
-    conf = build_conf(args.conf)
-    DeepSpeedTrain(conf).run()
+    DeepSpeedTrain(args).run()
 
 
 if __name__ == '__main__':

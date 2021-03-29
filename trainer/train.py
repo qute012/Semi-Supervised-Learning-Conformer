@@ -3,8 +3,9 @@ import yaml
 import json
 
 class DeepSpeedTrain(object):
-    def __init__(self, conf):
-        self.conf = conf
+    def __init__(self, args):
+        self.model_conf = self.build_model(args.model_conf)
+        self.train_conf = self.build_json_conf(args.train_conf)
         self.model = self.build_model()
         self.build_engine()
 
@@ -19,12 +20,12 @@ class DeepSpeedTrain(object):
         return conf
 
     def build_model(self):
-        if self.conf['model_type']=='ConformerCTC':
+        if self.model_conf['model_type']=='ConformerCTC':
             from model.model import ConformerCTC as Conformer
-        elif self.conf['model_type']=='ConformerTransducer':
+        elif self.model_conf['model_type']=='ConformerTransducer':
             from model.model import ConformerTransducer as Conformer
 
-        model = Conformer(self.conf['model_params'])
+        model = Conformer(self.model_conf['model_params'])
         return model
 
     def build_engine(self):
