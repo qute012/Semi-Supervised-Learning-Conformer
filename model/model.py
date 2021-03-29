@@ -3,6 +3,7 @@ import torch.nn as nn
 
 from encoder import ConformerEncoder
 
+class ConformerEncoder()
 
 class ConformerCTC(nn.Module):
     def __init__(
@@ -37,6 +38,10 @@ class ConformerCTC(nn.Module):
             eduction='mean',
             zero_infinity=True
         )
+
+    def from_pretrained(self, path):
+        state_dict = torch.load(path)
+        self.encoder.load_state_dict(state_dict['model'])
 
     def forward(self, inputs, input_length, target, target_length):
         enc_state, input_length = self.encoder(inputs, input_length)
@@ -92,6 +97,10 @@ class ConformerTransducer(nn.Module):
         self.pad_id = pad_id
         self.eos_id = eos_id
         self.sos_id = sos_id
+
+    def from_pretrained(self, path):
+        state_dict = torch.load(path)
+        self.encoder.load_state_dict(state_dict['model'])
 
     def forward(self, inputs, input_length, target):
         enc_state, input_length = self.encoder(inputs, input_length)

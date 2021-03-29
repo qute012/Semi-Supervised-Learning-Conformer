@@ -1,8 +1,8 @@
 from torch.optim import Optimizer
 
+
 class NoamOpt(object):
     """Optim wrapper that implements rate."""
-
     def __init__(
             self,
             optimizer: Optimizer,
