@@ -54,7 +54,7 @@ class ConvolutionModule(nn.Module):
         super().__init__()
         expansion_dim = in_dim * expansion_factor
 
-        self.modules = nn.Sequential(
+        self.layers = nn.Sequential(
             nn.LayerNorm(in_dim),
             Transpose(1,0),
             PointwiseConv(in_dim, expansion_dim),
@@ -68,4 +68,4 @@ class ConvolutionModule(nn.Module):
         )
 
     def forward(self, x):
-        return x + self.modules(x)
+        return x + self.layers(x)
