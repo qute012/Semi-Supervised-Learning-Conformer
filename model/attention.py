@@ -60,7 +60,17 @@ class RelPositionMultiHeadAttention(MultiHeadAttention):
         torch.nn.init.xavier_uniform(self.pos_bias_u)
         torch.nn.init.xavier_uniform(self.pos_bias_v)
 
-    def rel_shift(self,):
+    def rel_shift(self, p, zero_triu=False):
+        zero_pad = torch.zeros_like(p[:,:,:,0])
+        x_padded = torch.cat([zero_pad,p], dim=-1)
+
+        x_padded = x_padded.view(*p.shape[:2], p.size(3)+1, p.size(2))
+        p = x_padded[:, :, 1:].view_as(p)
+
+        if zero_triu:
+            ones = torch.ones_like(p[0,0,:,:])
+            p = p * torch.tril(ones, p.size(3) - p.size(2))[None,None,:,:]
+        return p
 
     def forward(self, q, k, v, pos, mask=None):
         btz = q.size(0)
@@ -68,6 +78,17 @@ class RelPositionMultiHeadAttention(MultiHeadAttention):
         q, k, v = self.forward_qkv(q, k, v)
         q = q.transpose(1,2)
 
-        pos = self.w_pos(pos).view(btz, -1, self.num_heads, self.d_k)
-        pos = pos.transpose(1,2)
+        p = self.w_pos(pos).view(btz, -1, self.num_heads, self.d_k)
+        p = p.transpose(1,2)
 
+        q_with_bias_u = (q+self.pos_bias_u).transpose(1,2)
+        q_with_bias_v = (q + self.pos_bias_v).transpose(1, 2)
+
+        matrix_ac = torch.matmul(q_with_bias_u, k.transpose(-2,-1))
+
+        matrix_bd = torch.matmul(q_with_bias_v, p.transpose(-2,-1))
+        matrix_bd = self.rel_shift(matrix_bd)
+
+        scores = (matrix_ac + matrix_bd) / math.sqrt(self.d_k)
+
+        return self.forward_attention(v, scores, mask)
