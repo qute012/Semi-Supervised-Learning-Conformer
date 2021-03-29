@@ -45,3 +45,29 @@ class MultiHeadAttention(nn.Module):
         q,k,v = self.forward_qkv(q, k, v)
         scores = torch.matmul(q,k.transpose(-2,-1)) / math.sqrt(self.d_k)
         return self.forward_attention(v, scores, mask)
+
+class RelPositionMultiHeadAttention(MultiHeadAttention):
+    def __init__(
+            self,
+            hidden_dim,
+            num_heads,
+            dropout_p=0
+    ):
+        super().__init__(hidden_dim, num_heads, dropout_p)
+        self.w_pos = nn.Linear(hidden_dim, hidden_dim, bias=False)
+        self.pos_bias_u = nn.Parameter(torch.Tensor(self.num_heads, self.d_k))
+        self.pos_bias_v = nn.Parameter(torch.Tensor(self.num_heads, self.d_k))
+        torch.nn.init.xavier_uniform(self.pos_bias_u)
+        torch.nn.init.xavier_uniform(self.pos_bias_v)
+
+    def rel_shift(self,):
+
+    def forward(self, q, k, v, pos, mask=None):
+        btz = q.size(0)
+
+        q, k, v = self.forward_qkv(q, k, v)
+        q = q.transpose(1,2)
+
+        pos = self.w_pos(pos).view(btz, -1, self.num_heads, self.d_k)
+        pos = pos.transpose(1,2)
+
