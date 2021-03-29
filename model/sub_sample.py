@@ -14,7 +14,7 @@ class SubSampling(nn.Module):
         :param out_dim: conformer hidden dimension.
         :param dropout_p: dropout prob.
         """
-        super(SubSampling, self).__init__()
+        super().__init__()
         self.conv = nn.Sequential(
             nn.Conv2d(1, out_dim, 3, 2),
             nn.SiLU(),
