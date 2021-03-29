@@ -88,5 +88,6 @@ class ConformerTransducer(nn.Module):
             blank_label=pad_id
         )
 
-    def forward(self):
-        pass
+    def forward(self, inputs, input_length, target):
+        enc_state = self.encoder(inputs)
+        

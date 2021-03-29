@@ -1,7 +1,6 @@
 import argparse
 
-from utils.utils import build_conf
-from trainer.train import DeepSpeedTrain
+from trainer.deepspeed_train import DeepSpeedTrain
 
 
 def main():

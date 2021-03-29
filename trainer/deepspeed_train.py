@@ -23,9 +23,9 @@ class DeepSpeedTrain(object):
         return conf
 
     def build_model(self):
-        if self.model_conf['model_type'] == 'ConformerCTC':
+        if self.model_conf.get('model_type') == 'ConformerCTC':
             from model.model import ConformerCTC as Conformer
-        elif self.model_conf['model_type'] == 'ConformerTransducer':
+        elif self.model_conf.get('model_type') == 'ConformerTransducer':
             from model.model import ConformerTransducer as Conformer
 
         model = Conformer(self.model_conf['model_params'])
