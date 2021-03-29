@@ -1,5 +1,5 @@
-import torch
 import torch.nn as nn
+from activation import GLU, Swish
 
 class PointwiseConv(nn.Module):
     def __init__(
@@ -29,10 +29,42 @@ class DepthwiseConv1d(nn.Module):
         x = self.conv(x)
         return x
 
-class ConvolutionModule(nn.Module):
+class Transpose(nn.Module):
     def __init__(
-            self
+            self,
+            dim0,
+            dim1,
     ):
         super().__init__()
+        self.dim0 = dim0
+        self.dim1 = dim1
 
-    def forward(self):
+    def forward(self, x):
+        return x.transpose(self.dim0, self.dim1)
+
+class ConvolutionModule(nn.Module):
+    def __init__(
+            self,
+            in_dim,
+            kernel_size=32,
+            expansion_factor=2,
+            dropout_p=0.1
+    ):
+        super().__init__()
+        expansion_dim = in_dim * expansion_factor
+
+        self.modules = nn.Sequential(
+            nn.LayerNorm(in_dim),
+            Transpose(1,0),
+            PointwiseConv(in_dim, expansion_dim),
+            GLU(dim=-1),
+            DepthwiseConv1d(in_dim, in_dim, kernel_size),
+            nn.BatchNorm1d(in_dim),
+            Swish(),
+            PointwiseConv(in_dim, in_dim),
+            Transpose(1,0),
+            nn.Dropout(dropout_p)
+        )
+
+    def forward(self, x):
+        return self.modules(x)
