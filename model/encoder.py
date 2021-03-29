@@ -7,7 +7,7 @@ class ConformerEncoder(nn.Module):
     def __init__(
             self,
             in_dim,
-            n_block,
+            n_blocks,
             hidden_dim,
             num_heads,
             kernel_size=32,
@@ -19,7 +19,7 @@ class ConformerEncoder(nn.Module):
 
         self.subsampling = SubSampling(in_dim, hidden_dim, dropout_p)
         self.blocks = []
-        for _ in range(n_block):
+        for _ in range(n_blocks):
             self.layers.append(
                 ConformerBlock(
                     hidden_dim=hidden_dim,
@@ -32,3 +32,7 @@ class ConformerEncoder(nn.Module):
             )
         self.layers = nn.ModuleList(self.layers)
 
+    def forward(self, x):
+        x = self.subsampling(x)
+        x = self.layers(x)
+        return x
