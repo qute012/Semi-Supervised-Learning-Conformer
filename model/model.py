@@ -1,5 +1,4 @@
 import torch.nn as nn
-from warprnnt_pytorch import RNNTLoss
 
 from encoder import ConformerEncoder
 
@@ -81,6 +80,8 @@ class ConformerTransducer(nn.Module):
             decoder_dim,
             num_layers=dec_layers
         )
+
+        from warprnnt_pytorch import RNNTLoss
 
         self.criterion = RNNTLoss(
             size_average=True,
