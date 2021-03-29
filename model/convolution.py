@@ -28,3 +28,11 @@ class DepthwiseConv1d(nn.Module):
     def forward(self, x):
         x = self.conv(x)
         return x
+
+class ConvolutionModule(nn.Module):
+    def __init__(
+            self
+    ):
+        super().__init__()
+
+    def forward(self):
