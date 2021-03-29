@@ -3,7 +3,13 @@ from torch.optim import Optimizer
 class NoamOpt(object):
     """Optim wrapper that implements rate."""
 
-    def __init__(self, optimizer:Optimizer, model_size=256, warmup=1000, factor=1):
+    def __init__(
+            self,
+            optimizer: Optimizer,
+            model_size=256,
+            warmup=1000,
+            factor=1
+    ):
         """Construct an NoamOpt object."""
         self.optimizer = optimizer
         self._step = 0
