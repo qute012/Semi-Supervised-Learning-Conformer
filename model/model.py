@@ -42,8 +42,8 @@ class ConformerCTC(nn.Module):
         )
 
 
-    def forward(self):
-        pass
+    def forward(self, inputs, input_length, target):
+        enc_state, input_length = self.encoder(inputs, input_length)
 
 
 class ConformerTransducer(nn.Module):
@@ -89,5 +89,5 @@ class ConformerTransducer(nn.Module):
         )
 
     def forward(self, inputs, input_length, target):
-        enc_state = self.encoder(inputs)
-        
+        enc_state, input_length = self.encoder(inputs, input_length)
+
