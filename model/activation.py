@@ -8,3 +8,7 @@ class GLU(nn.Module):
     def forward(self, x):
         out, gate = x.chunk(2, dim=self.dim)
         return out * gate.sigmoid()
+
+class Swish(nn.Module):
+    def forward(self, x):
+        return x * x.sigmoid()
