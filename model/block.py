@@ -54,13 +54,16 @@ class ConformerBlock(nn.Module):
             self,
             hidden_dim,
             num_heads,
+            kernel_size=32,
+            conv_expansion_factor=2,
+            ffn_expansion_factor=4,
             dropout_p=0.1
     ):
         super(ConformerBlock, self).__init__()
 
         self.layers = nn.Sequential(
             Residual(
-                Scale(FeedForwardModule(hidden_dim), 0.5)
+                Scale(FeedForwardModule(hidden_dim, ffn_expansion_factor), 0.5)
             ),
             Residual(
                 nn.LayerNorm(hidden_dim),
@@ -68,10 +71,10 @@ class ConformerBlock(nn.Module):
                 nn.Dropout(dropout_p)
             ),
             Residual(
-                ConvolutionModule(hidden_dim)
+                ConvolutionModule(hidden_dim, kernel_size, conv_expansion_factor)
             ),
             Residual(
-                Scale(FeedForwardModule(hidden_dim), 0.5)
+                Scale(FeedForwardModule(hidden_dim, ffn_expansion_factor), 0.5)
             ),
             nn.LayerNorm(hidden_dim)
         )
