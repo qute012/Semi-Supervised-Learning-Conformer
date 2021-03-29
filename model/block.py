@@ -59,7 +59,7 @@ class ConformerBlock(nn.Module):
             ffn_expansion_factor=4,
             dropout_p=0.1
     ):
-        super(ConformerBlock, self).__init__()
+        super().__init__()
 
         self.layers = nn.Sequential(
             Residual(
