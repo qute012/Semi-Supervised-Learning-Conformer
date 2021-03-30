@@ -1,3 +1,6 @@
 [submodule "third-party/flashlight"]
 	path = third-party/flashlight
 	url = https://github.com/facebookresearch/flashlight.git
+[submodule "third-party/warp-transducer"]
+	path = third-party/warp-transducer
+	url = https://github.com/HawkAaron/warp-transducer.git
