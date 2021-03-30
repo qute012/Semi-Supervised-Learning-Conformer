@@ -3,7 +3,39 @@ import torch.nn as nn
 
 from encoder import ConformerEncoder
 
-class Conformer(nn.Module):
+class ConformerForPreTraining(ConformerEncoder):
+    def __init__(
+            self,
+            in_dim,
+            encoder_dim=256,
+            enc_layers=16,
+            num_heads=4,
+            kernel_size=32,
+            conv_expansion_factor=2,
+            ffn_expansion_factor=4,
+            dropout_p=0.1,
+    ):
+        super().__init__()
+        self.encoder = ConformerEncoder(
+            in_dim=in_dim,
+            n_layers=enc_layers,
+            hidden_dim=encoder_dim,
+            num_heads=num_heads,
+            kernel_size=kernel_size,
+            conv_expansion_factor=conv_expansion_factor,
+            ffn_expansion_factor=ffn_expansion_factor,
+            dropout_p=dropout_p
+        )
+
+    @property
+    def state_dict(self):
+        return self.encoder.state_dict()
+
+    @property
+    def load_state_dict(self, state_dict, strict=True):
+        self.encoder.load_state_dict(state_dict, strict)
+
+    def forward(self, x, input_length):
 
 class ConformerCTC(nn.Module):
     def __init__(
@@ -31,13 +63,15 @@ class ConformerCTC(nn.Module):
             dropout_p=dropout_p
         )
 
-        self.pad_id = pad_id
+        self.fc = nn.Linear(encoder_dim, n_classes)
 
         self.criterion = nn.CTCLoss(
             blank=pad_id,
             reduction='mean',
             zero_infinity=True
         )
+
+        self.pad_id = pad_id
 
     def from_pretrained(self, path):
         state_dict = torch.load(path)
@@ -86,6 +120,7 @@ class ConformerTransducer(nn.Module):
             decoder_dim,
             num_layers=dec_layers
         )
+        self.fc = nn.Linear(decoder_dim, n_classes)
 
         from warprnnt_pytorch import RNNTLoss
 
