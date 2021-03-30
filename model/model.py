@@ -49,7 +49,7 @@ class ConformerCTC(nn.Module):
         return loss, enc_state, input_length
 
     def recognize(self):
-        pass
+        raise NotImplementedError
 
 
 class ConformerTransducer(nn.Module):
@@ -104,10 +104,10 @@ class ConformerTransducer(nn.Module):
 
     def forward(self, inputs, input_length, target):
         enc_state, input_length = self.encoder(inputs, input_length)
-        pass
+        raise NotImplementedError
 
     def recognize(self):
-        pass
+        raise NotImplementedError
 
     def add_eos(self, inputs):
         padded_eos = torch.zeros(inputs.size(0), 1).fill_(self.eos_id)
