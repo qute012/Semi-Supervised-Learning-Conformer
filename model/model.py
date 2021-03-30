@@ -5,28 +5,8 @@ from encoder import ConformerEncoder
 
 
 class ConformerForPreTraining(ConformerEncoder):
-    def __init__(
-            self,
-            in_dim,
-            encoder_dim=256,
-            enc_layers=16,
-            num_heads=4,
-            kernel_size=32,
-            conv_expansion_factor=2,
-            ffn_expansion_factor=4,
-            dropout_p=0.1,
-    ):
-        super().__init__()
-        self.encoder = ConformerEncoder(
-            in_dim=in_dim,
-            n_layers=enc_layers,
-            hidden_dim=encoder_dim,
-            num_heads=num_heads,
-            kernel_size=kernel_size,
-            conv_expansion_factor=conv_expansion_factor,
-            ffn_expansion_factor=ffn_expansion_factor,
-            dropout_p=dropout_p
-        )
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     @property
     def state_dict(self):
