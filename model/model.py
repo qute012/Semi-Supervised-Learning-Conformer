@@ -65,6 +65,7 @@ class ConformerCTC(nn.Module):
         loss = self.criterion(enc_state.log_softmax(2), target, input_length, target_length)
         return loss, enc_state, input_length
 
+    @torch.no_grad()
     def recognize(self):
         raise NotImplementedError
 
@@ -124,6 +125,7 @@ class ConformerTransducer(nn.Module):
         enc_state, input_length = self.encoder(inputs, input_length)
         raise NotImplementedError
 
+    @torch.no_grad()
     def recognize(self):
         raise NotImplementedError
 
