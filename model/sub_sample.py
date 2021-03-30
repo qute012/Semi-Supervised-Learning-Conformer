@@ -11,9 +11,9 @@ class SubSampling(nn.Module):
         super().__init__()
         self.conv = nn.Sequential(
             nn.Conv2d(1, out_dim, 3, 2),
-            nn.SiLU(),
+            nn.ReLU(),
             nn.Conv2d(out_dim, out_dim, 3, 2),
-            nn.SiLU()
+            nn.ReLU()
         )
 
         # 0 padding, (I-K+S)//S

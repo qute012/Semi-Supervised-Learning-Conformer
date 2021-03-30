@@ -3,6 +3,7 @@ import torch.nn as nn
 
 from encoder import ConformerEncoder
 
+
 class ConformerForPreTraining(ConformerEncoder):
     def __init__(
             self,
@@ -36,6 +37,8 @@ class ConformerForPreTraining(ConformerEncoder):
         self.encoder.load_state_dict(state_dict, strict)
 
     def forward(self, x, input_length):
+        enc_state = super().forward(x, input_length)
+
 
 class ConformerCTC(nn.Module):
     def __init__(
