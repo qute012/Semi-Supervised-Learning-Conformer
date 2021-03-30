@@ -1,3 +1,4 @@
+import torch
 import torch.nn as nn
 
 from activation import Swish
@@ -53,6 +54,34 @@ class Scale(nn.Module):
         return self.layers(x) * self.scale
 
 
+class MHSAParallelInput(nn.Module):
+    def __init__(
+            self,
+            *fn
+    ):
+        self.fn = nn.ModuleList(fn)
+
+    def forward(self, x):
+        return x, x, x, self.fn(x)
+
+
+class PositionalEncoding(nn.Module):
+    def __init__(self, dim_model, max_length=2000, dropout_p=0.1):
+        super().__init__()
+        pe = torch.zeros(max_length, dim_model, requires_grad=False)
+        position = torch.arange(0, max_length).unsqueeze(1).float()
+        exp_term = torch.exp(torch.arange(0, dim_model, 2).float() * -(math.log(10000.0) / dim_model))
+        pe[:, 0::2] = torch.sin(position * exp_term)
+        pe[:, 1::2] = torch.cos(position * exp_term)
+        pe = pe.unsqueeze(0)
+        self.register_buffer('pe', pe)
+
+        self.dropout = nn.Dropout(dropout_p)
+
+    def forward(self, x):
+        return self.pe[:, :x.size(1)]
+
+
 class ConformerBlock(nn.Module):
     def __init__(
             self,
@@ -71,6 +100,7 @@ class ConformerBlock(nn.Module):
             ),
             Residual(
                 nn.LayerNorm(hidden_dim),
+                MHSAParallelInput(PositionalEncoding(hidden_dim)),
                 RelPositionMultiHeadAttention(hidden_dim, num_heads),
                 nn.Dropout(dropout_p)
             ),
