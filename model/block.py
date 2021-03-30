@@ -1,3 +1,4 @@
+import math
 import torch
 import torch.nn as nn
 
@@ -13,7 +14,7 @@ class FeedForwardModule(nn.Module):
             expansion_factor=4,
             dropout_p=0.1,
     ):
-        super().__init__()
+        super(FeedForwardModule, self).__init__()
 
         expansion_dim = in_dim * expansion_factor
 
@@ -35,6 +36,7 @@ class Residual(nn.Module):
             self,
             *layers
     ):
+        super(Residual, self).__init__()
         self.layers = nn.ModuleList(layers)
 
     def forward(self, x):
@@ -47,6 +49,7 @@ class Scale(nn.Module):
             *layers,
             scale
     ):
+        super(Scale, self).__init__()
         self.scale = scale
         self.layers = nn.ModuleList(layers)
 
@@ -54,20 +57,58 @@ class Scale(nn.Module):
         return self.layers(x) * self.scale
 
 
+class OptionalSequential(nn.Module):
+    def __init__(
+            self,
+            *layers
+    ):
+        super(OptionalSequential, self).__init__()
+        self.layers = nn.ModuleList(layers)
+
+    def forward(self, *args, **kwargs):
+        opt_params = list(kwargs.keys())
+        opt_inputs = list(kwargs.values())
+
+        if len(args) == 1:
+            inputs = args[0]
+        else:
+            inputs = args
+
+        for layer in self.layers:
+            params = set(layer.__code__.co_varnames)
+            opt_lparams = list(set(opt_params) & params)
+            opt_linputs = [opt_inputs[opt_params.index(k)] for k in opt_lparams]
+            opt = self.make_dict(opt_lparams, opt_linputs)
+
+            if len(opt) == 0:
+                inputs = layer(inputs)
+            else:
+                inputs = layer(inputs, **opt)
+        return inputs
+
+    @staticmethod
+    def make_dict(self, keys, values):
+        temp_dict = dict()
+        for k, v in zip(keys, values):
+            temp_dict[k] = v
+        return temp_dict
+
+
 class MHSAParallelInput(nn.Module):
     def __init__(
             self,
             *fn
     ):
+        super(MHSAParallelInput, self).__init__()
         self.fn = nn.ModuleList(fn)
 
-    def forward(self, x):
-        return x, x, x, self.fn(x)
+    def forward(self, x, mask):
+        return x, x, x, self.fn(x), mask
 
 
 class PositionalEncoding(nn.Module):
     def __init__(self, dim_model, max_length=2000, dropout_p=0.1):
-        super().__init__()
+        super(PositionalEncoding, self).__init__()
         pe = torch.zeros(max_length, dim_model, requires_grad=False)
         position = torch.arange(0, max_length).unsqueeze(1).float()
         exp_term = torch.exp(torch.arange(0, dim_model, 2).float() * -(math.log(10000.0) / dim_model))
@@ -92,10 +133,10 @@ class ConformerBlock(nn.Module):
             ffn_expansion_factor=4,
             dropout_p=0.1
     ):
-        super().__init__()
+        super(ConformerBlock, self).__init__()
 
         #TODO: How about separating between MHA from feedforward?
-        self.layers = nn.Sequential(
+        self.layers = OptionalSequential(
             Residual(
                 Scale(FeedForwardModule(hidden_dim, ffn_expansion_factor), 0.5)
             ),
@@ -114,6 +155,5 @@ class ConformerBlock(nn.Module):
             nn.LayerNorm(hidden_dim)
         )
 
-    def forward(self, x, input_length):
-        raise NotImplementedError
-        return self.layers(x)
+    def forward(self, x, mask):
+        return self.layers(x, mask=mask)

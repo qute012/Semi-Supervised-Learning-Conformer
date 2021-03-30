@@ -17,7 +17,7 @@ class ConformerEncoder(nn.Module):
             ffn_expansion_factor=4,
             dropout_p=0.1
     ):
-        super().__init__()
+        super(ConformerEncoder, self).__init__()
 
         self.subsampling = SubSampling(in_dim, hidden_dim, dropout_p)
         self.blocks = []
@@ -33,6 +33,17 @@ class ConformerEncoder(nn.Module):
                 )
             )
         self.layers = nn.ModuleList(self.layers)
+
+    def forward(self, x, input_length, pad_mask=True):
+        x, input_length = self.subsampling(x, input_length)
+
+        if pad_mask:
+            mask = self.make_pad_mask(input_length, len(input_length.size()))
+        else:
+            mask = None
+
+        x, mask = self.layers(x, mask)
+        return x, input_length
 
     @staticmethod
     def make_pad_mask(self, lengths, length_dim=-1):
@@ -53,14 +64,3 @@ class ConformerEncoder(nn.Module):
         mask = ~mask.unsqueeze(1)
         mask = mask.eq(0)
         return mask
-
-    def forward(self, x, input_length, pad_mask=True):
-        x, input_length = self.subsampling(x, input_length)
-
-        if pad_mask:
-            mask = self.make_pad_mask(input_length, len(input_length.size()))
-        else:
-            mask = None
-
-        x, mask = self.layers(x, mask)
-        return x, input_length

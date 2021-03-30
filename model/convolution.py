@@ -25,7 +25,7 @@ class DepthwiseConv1d(nn.Module):
             kernel_size=32,
             padding=0
     ):
-        super().__init__()
+        super(DepthwiseConv1d, self).__init__()
         self.conv = nn.Conv1d(in_dim, out_dim, kernel_size, padding=padding)
 
     def forward(self, x):
@@ -39,7 +39,7 @@ class Transpose(nn.Module):
             dim0,
             dim1,
     ):
-        super().__init__()
+        super(Transpose, self).__init__()
         self.dim0 = dim0
         self.dim1 = dim1
 
@@ -55,7 +55,7 @@ class ConvolutionModule(nn.Module):
             expansion_factor=2,
             dropout_p=0.1
     ):
-        super().__init__()
+        super(ConvolutionModule, self).__init__()
         expansion_dim = in_dim * expansion_factor
 
         self.layers = nn.Sequential(

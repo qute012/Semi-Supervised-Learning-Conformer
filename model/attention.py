@@ -10,6 +10,7 @@ class MultiHeadAttention(nn.Module):
             num_heads,
             dropout_p=0,
     ):
+        super(MultiHeadAttention, self).__init__()
         self.d_k = hidden_dim//num_heads
         self.num_heads = num_heads
         self.w_q = nn.Linear(hidden_dim, hidden_dim)
@@ -55,7 +56,7 @@ class RelPositionMultiHeadAttention(MultiHeadAttention):
             num_heads,
             dropout_p=0
     ):
-        super().__init__(hidden_dim, num_heads, dropout_p)
+        super(RelPositionMultiHeadAttention, self).__init__(hidden_dim, num_heads, dropout_p)
         self.w_pos = nn.Linear(hidden_dim, hidden_dim, bias=False)
         self.pos_bias_u = nn.Parameter(torch.Tensor(self.num_heads, self.d_k))
         self.pos_bias_v = nn.Parameter(torch.Tensor(self.num_heads, self.d_k))

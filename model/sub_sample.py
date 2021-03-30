@@ -8,7 +8,7 @@ class SubSampling(nn.Module):
             out_dim,
             dropout_p=0.1,
     ):
-        super().__init__()
+        super(SubSampling, self).__init__()
         self.conv = nn.Sequential(
             nn.Conv2d(1, out_dim, 3, 2),
             nn.ReLU(),

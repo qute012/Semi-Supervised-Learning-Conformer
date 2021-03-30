@@ -6,7 +6,7 @@ from encoder import ConformerEncoder
 
 class ConformerForPreTraining(ConformerEncoder):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super(ConformerForPreTraining, self).__init__(*args, **kwargs)
 
     @property
     def state_dict(self):
@@ -37,7 +37,7 @@ class ConformerCTC(nn.Module):
             dropout_p=0.1,
             pad_id=0
     ):
-        super().__init__()
+        super(ConformerCTC, self).__init__()
         self.encoder = ConformerEncoder(
             in_dim=in_dim,
             n_layers=enc_layers,
@@ -91,7 +91,7 @@ class ConformerTransducer(nn.Module):
             eos_id=1,
             sos_id=2
     ):
-        super().__init__()
+        super(ConformerTransducer, self).__init__()
         self.encoder = ConformerEncoder(
             in_dim=in_dim,
             n_layers=enc_layers,

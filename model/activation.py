@@ -3,7 +3,7 @@ import torch.nn as nn
 
 class GLU(nn.Module):
     def __init__(self, dim):
-        super().__init__()
+        super(GLU, self).__init__()
         self.dim = dim
 
     def forward(self, x):
@@ -12,5 +12,8 @@ class GLU(nn.Module):
 
 
 class Swish(nn.Module):
+    def __init__(self):
+        super(Swish, self).__init__()
+
     def forward(self, x):
         return x * x.sigmoid()
