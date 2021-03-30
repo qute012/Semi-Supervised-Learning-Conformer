@@ -1,0 +1,3 @@
+[submodule "third-party/flashlight"]
+	path = third-party/flashlight
+	url = https://github.com/facebookresearch/flashlight.git
