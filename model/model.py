@@ -16,6 +16,9 @@ class ConformerForPreTraining(ConformerEncoder):
     def load_state_dict(self, state_dict, strict=True):
         self.encoder.load_state_dict(state_dict, strict)
 
+    def negative_sampling(self, y, n, count_pad=None):
+        raise NotImplementedError
+
     def forward(self, x, input_length):
         enc_state = super().forward(x, input_length)
 

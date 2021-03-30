@@ -1,3 +1,11 @@
+def buffered_arange(max):
+    if not hasattr(buffered_arange, "buf"):
+        buffered_arange.buf = torch.LongTensor()
+    if max > buffered_arange.buf.numel():
+        buffered_arange.buf.resize_(max)
+        torch.arange(max, out=buffered_arange.buf)
+    return buffered_arange.buf[:max]
+
 def sample_negatives(self, y, num, padding_count=None):
     if self.n_negatives == 0 and self.cross_sample_negatives == 0:
         return y.new(0)

@@ -1,3 +1,4 @@
+import torch
 import torch.nn as nn
 
 from sub_sample import SubSampling
@@ -33,7 +34,33 @@ class ConformerEncoder(nn.Module):
             )
         self.layers = nn.ModuleList(self.layers)
 
-    def forward(self, x, input_length):
+    @staticmethod
+    def make_pad_mask(self, lengths, length_dim=-1):
+        if length_dim == 0:
+            raise ValueError("length_dim cannot be 0: {}".format(length_dim))
+
+        if not isinstance(lengths, list):
+            lengths = lengths.tolist()
+        btz = int(len(lengths))
+
+        max_len = int(max(lengths))
+
+        seq_range = torch.arange(0, max_len, dtype=torch.int64)
+        seq_range_expand = seq_range.unsqueeze(0).expand(btz, max_len)
+        seq_length_expand = seq_range_expand.new(lengths).unsqueeze(-1)
+        mask = seq_range_expand >= seq_length_expand
+
+        mask = ~mask.unsqueeze(1)
+        mask = mask.eq(0)
+        return mask
+
+    def forward(self, x, input_length, pad_mask=True):
         x, input_length = self.subsampling(x, input_length)
-        x, input_length = self.layers(x, input_length)
+
+        if pad_mask:
+            mask = self.make_pad_mask(input_length, len(input_length.size()))
+        else:
+            mask = None
+
+        x, mask = self.layers(x, mask)
         return x, input_length
