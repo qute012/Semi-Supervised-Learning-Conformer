@@ -94,6 +94,7 @@ class ConformerBlock(nn.Module):
     ):
         super().__init__()
 
+        #TODO: How about separating between MHA from feedforward?
         self.layers = nn.Sequential(
             Residual(
                 Scale(FeedForwardModule(hidden_dim, ffn_expansion_factor), 0.5)
