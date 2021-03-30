@@ -3,7 +3,7 @@ import torch.nn as nn
 
 from encoder import ConformerEncoder
 
-class ConformerEncoder()
+class Conformer(nn.Module):
 
 class ConformerCTC(nn.Module):
     def __init__(
@@ -108,8 +108,7 @@ class ConformerTransducer(nn.Module):
     def recognize(self):
         pass
 
-    def add_sos_eos(self, inputs):
-        padded_sos = torch.zeros(inputs.size(0), 1).fill_(self.sos_id)
+    def add_eos(self, inputs):
         padded_eos = torch.zeros(inputs.size(0), 1).fill_(self.eos_id)
-        inputs = torch.cat((padded_sos, inputs, padded_eos), dim=1)
+        inputs = torch.cat((inputs, padded_eos), dim=1)
         return inputs
