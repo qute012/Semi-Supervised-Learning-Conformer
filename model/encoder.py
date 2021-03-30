@@ -35,5 +35,5 @@ class ConformerEncoder(nn.Module):
 
     def forward(self, x, input_length):
         x, input_length = self.subsampling(x, input_length)
-        x = self.layers(x)
+        x, input_length = self.layers(x, input_length)
         return x, input_length

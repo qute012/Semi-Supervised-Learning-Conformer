@@ -113,5 +113,6 @@ class ConformerBlock(nn.Module):
             nn.LayerNorm(hidden_dim)
         )
 
-    def forward(self, x):
+    def forward(self, x, input_length):
+        raise NotImplementedError
         return self.layers(x)

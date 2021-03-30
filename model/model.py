@@ -35,7 +35,7 @@ class ConformerCTC(nn.Module):
 
         self.criterion = nn.CTCLoss(
             blank=pad_id,
-            eduction='mean',
+            reduction='mean',
             zero_infinity=True
         )
 
