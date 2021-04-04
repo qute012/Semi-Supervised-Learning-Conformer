@@ -108,6 +108,7 @@ class ConformerForPreTraining(ConformerEncoder):
 
     def forward(self, x, input_length):
         enc_state = super().forward(x, input_length)
+        raise NotImplementedError
 
 
 class ConformerCTC(nn.Module):
