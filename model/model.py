@@ -10,11 +10,20 @@ class ConformerForPreTraining(ConformerEncoder):
 
     @property
     def state_dict(self):
-        return self.encoder.state_dict()
+        return self.state_dict()
 
     @property
     def load_state_dict(self, state_dict, strict=True):
-        self.encoder.load_state_dict(state_dict, strict)
+        self.load_state_dict(state_dict, strict)
+
+    @classmethod
+    def buffered_arange(cls, max):
+        if not hasattr(cls.buffered_arange, "buf"):
+            cls.buffered_arange.buf = torch.LongTensor()
+        if max > cls.buffered_arange.buf.numel():
+            cls.buffered_arange.buf.resize_(max)
+            torch.arange(max, out=cls.buffered_arange.buf)
+        return cls.buffered_arange.buf[:max]
 
     @torch.no_grad
     def negative_sampling(self, y, n=10, input_length=None):
@@ -69,15 +78,6 @@ class ConformerForPreTraining(ConformerEncoder):
             .view(bsz, tsz, n, fsz)\
             .permute(2, 0, 1, 3)
         return negatives
-
-    @classmethod
-    def buffered_arange(cls, max):
-        if not hasattr(cls.buffered_arange, "buf"):
-            cls.buffered_arange.buf = torch.LongTensor()
-        if max > cls.buffered_arange.buf.numel():
-            cls.buffered_arange.buf.resize_(max)
-            torch.arange(max, out=cls.buffered_arange.buf)
-        return cls.buffered_arange.buf[:max]
 
     def forward(self, x, input_length):
         enc_state = super().forward(x, input_length)
