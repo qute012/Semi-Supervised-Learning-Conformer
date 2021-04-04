@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 
 from encoder import ConformerEncoder
+from ..criterion.losses import ContrastiveLoss
 
 
 class ConformerForPreTraining(ConformerEncoder):
@@ -27,7 +28,9 @@ class ConformerForPreTraining(ConformerEncoder):
             dropout_p=dropout_p
         )
 
+        self.out_proj = nn.Linear(encoder_dim, encoder_dim)
         self.quantization = nn.Linear(encoder_dim, encoder_dim)
+        self.criterion = ContrastiveLoss(reduce='sum')
 
     @property
     def state_dict(self):
@@ -99,6 +102,9 @@ class ConformerForPreTraining(ConformerEncoder):
             .view(bsz, tsz, n, fsz)\
             .permute(2, 0, 1, 3)
         return negatives
+
+    def get_logits(self):
+        raise NotImplementedError
 
     def forward(self, x, input_length):
         enc_state = super().forward(x, input_length)
