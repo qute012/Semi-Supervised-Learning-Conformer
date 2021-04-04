@@ -5,8 +5,29 @@ from encoder import ConformerEncoder
 
 
 class ConformerForPreTraining(ConformerEncoder):
-    def __init__(self, *args, **kwargs):
-        super(ConformerForPreTraining, self).__init__(*args, **kwargs)
+    def __init__(
+            self,
+            in_dim,
+            encoder_dim=256,
+            enc_layers=16,
+            num_heads=4,
+            kernel_size=32,
+            conv_expansion_factor=2,
+            ffn_expansion_factor=4,
+            dropout_p=0.1,
+    ):
+        super(ConformerForPreTraining, self).__init__(
+            in_dim=in_dim,
+            n_layers=enc_layers,
+            hidden_dim=encoder_dim,
+            num_heads=num_heads,
+            kernel_size=kernel_size,
+            conv_expansion_factor=conv_expansion_factor,
+            ffn_expansion_factor=ffn_expansion_factor,
+            dropout_p=dropout_p
+        )
+
+        self.quantization = nn.Linear(encoder_dim, encoder_dim)
 
     @property
     def state_dict(self):
@@ -70,7 +91,7 @@ class ConformerForPreTraining(ConformerEncoder):
             neg_idxs = torch.stack(neg_idxs)
 
         if n > 0:
-            for i in range(1,bsz):
+            for i in range(1, bsz):
                 neg_idxs[i] += i*high
 
         negatives = y[neg_idxs.view(-1)]
