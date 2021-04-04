@@ -1,13 +1,15 @@
+import torch
 from torch.optim import Optimizer
 
 
 class NoamOpt(object):
     """Optim wrapper that implements rate."""
+
     def __init__(
             self,
             optimizer: Optimizer,
             model_size=256,
-            warmup=1000,
+            warmup=25000,
             factor=1
     ):
         """Construct an NoamOpt object."""
@@ -37,9 +39,9 @@ class NoamOpt(object):
         if step is None:
             step = self._step
         return (
-            self.factor
-            * self.model_size ** (-0.5)
-            * min(step ** (-0.5), step * self.warmup ** (-1.5))
+                self.factor
+                * self.model_size ** (-0.5)
+                * min(step ** (-0.5), step * self.warmup ** (-1.5))
         )
 
     def get_lr(self):
@@ -68,3 +70,9 @@ class NoamOpt(object):
                 self.optimizer.load_state_dict(state_dict["optimizer"])
             else:
                 setattr(self, key, value)
+
+    @staticmethod
+    def build_optimizer(model_params, d_model, warmup, factor):
+        """Get standard NoamOpt."""
+        base = torch.optim.Adam(model_params, lr=0, betas=(0.9, 0.98), eps=1e-9)
+        return NoamOpt(d_model, factor, warmup, base)
