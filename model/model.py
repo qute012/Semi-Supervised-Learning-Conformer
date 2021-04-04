@@ -16,8 +16,68 @@ class ConformerForPreTraining(ConformerEncoder):
     def load_state_dict(self, state_dict, strict=True):
         self.encoder.load_state_dict(state_dict, strict)
 
-    def negative_sampling(self, y, n, count_pad=None):
-        raise NotImplementedError
+    @torch.no_grad
+    def negative_sampling(self, y, n=10, input_length=None):
+        bsz, tsz, fsz = y.shape
+
+        y = y.view(-1, fsz)
+
+        high = tsz
+
+        if input_length is None:
+            max_seq_len = tsz
+
+            ctx_idxs = self.buffered_arange(tsz)\
+                .unsqueeze(-1)\
+                .expand(-1, n)\
+                .flatten()
+
+            neg_idxs = torch.randint(
+                low=0,
+                high=max_seq_len,
+                size=(bsz, n*tsz)
+            )
+
+            neg_idxs[neg_idxs >= ctx_idxs] += 1
+        else:
+            ctx_idxs = self.buffered_arange(tsz) \
+                .unsqueeze(-1) \
+                .expand(-1, n) \
+                .flatten()
+
+            neg_idxs = []
+
+            for max_seq_len in input_length:
+                neg_idx = torch.randint(
+                    low=0,
+                    high=max_seq_len,
+                    size=(1, n * tsz)
+                )
+
+                neg_idx[neg_idx >= ctx_idxs] += 1
+
+                neg_idxs.append(neg_idx)
+
+            neg_idxs = torch.stack(neg_idxs)
+
+        if n > 0:
+            for i in range(1,bsz):
+                neg_idxs[i] += i*high
+
+        negatives = y[neg_idxs.view(-1)]
+        negatives = negatives\
+            .view(bsz, tsz, n, fsz)\
+            .permute(2, 0, 1, 3)
+        return negatives
+
+    @classmethod
+    def buffered_arange(cls, max):
+        if not hasattr(cls.buffered_arange, "buf"):
+            cls.buffered_arange.buf = torch.LongTensor()
+        if max > cls.buffered_arange.buf.numel():
+            cls.buffered_arange.buf.resize_(max)
+            torch.arange(max, out=cls.buffered_arange.buf)
+        return cls.buffered_arange.buf[:max]
 
     def forward(self, x, input_length):
         enc_state = super().forward(x, input_length)

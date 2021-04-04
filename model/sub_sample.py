@@ -26,8 +26,8 @@ class SubSampling(nn.Module):
     def forward(self, x, input_length=None):
         x = x.unsqueeze(1)
         x = self.conv(x)
-        B, C, T, F = x.shape
-        x = self.w(x.transpose(1, 2).view(B, T, C * F))
+        bsz, csz, tsz, fsz = x.shape
+        x = self.w(x.transpose(1, 2).view(bsz, tsz, csz * fsz))
 
         input_length = self._subsampling_size(input_length)
         return x, input_length
