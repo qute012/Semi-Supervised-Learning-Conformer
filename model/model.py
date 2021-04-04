@@ -102,10 +102,7 @@ class ConformerForPreTraining(ConformerEncoder):
             .view(bsz, tsz, n, fsz)\
             .permute(2, 0, 1, 3)
         return negatives
-
-    def get_logits(self):
-        raise NotImplementedError
-
+    
     def forward(self, x, input_length):
         enc_state = super().forward(x, input_length)
         raise NotImplementedError
