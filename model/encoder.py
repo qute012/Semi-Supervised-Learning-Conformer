@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-from sub_sample import SubSampling
+from sub_sampling import SubSampling
 from block import ConformerBlock
 
 
@@ -19,7 +19,6 @@ class ConformerEncoder(nn.Module):
     ):
         super(ConformerEncoder, self).__init__()
 
-        self.subsampling = SubSampling(in_dim, hidden_dim, dropout_p)
         self.blocks = []
         for _ in range(n_layers):
             self.layers.append(
@@ -35,8 +34,6 @@ class ConformerEncoder(nn.Module):
         self.layers = nn.ModuleList(self.layers)
 
     def forward(self, x, input_length, pad_mask=True):
-        x, input_length = self.subsampling(x, input_length)
-
         if pad_mask:
             mask = self.make_pad_mask(input_length, len(input_length.size()))
         else:

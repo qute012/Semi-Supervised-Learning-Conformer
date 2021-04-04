@@ -1,7 +1,9 @@
+import random
 import torch
 import torch.nn as nn
 
 from encoder import ConformerEncoder
+from sub_sampling import SubSampling
 from ..criterion.losses import ContrastiveLoss
 
 
@@ -28,6 +30,7 @@ class ConformerForPreTraining(ConformerEncoder):
             dropout_p=dropout_p
         )
 
+        self.subsampling = SubSampling(in_dim, encoder_dim, dropout_p)
         self.out_proj = nn.Linear(encoder_dim, encoder_dim)
         self.quantization = nn.Linear(encoder_dim, encoder_dim)
         self.criterion = ContrastiveLoss(reduce='sum')
@@ -102,9 +105,26 @@ class ConformerForPreTraining(ConformerEncoder):
             .view(bsz, tsz, n, fsz)\
             .permute(2, 0, 1, 3)
         return negatives
-    
+
+    def masking(self, x, F=27, T_ratio=0.05):
+        bsz, tsz, fsz = x.shape
+
+        f0 = random.randint(0, fsz-F)
+        x[:, :, f0:f0 + F] = 0
+
+        T = random.randint(0, int(tsz*T_ratio))
+        t0 = random.randint(0, tsz - T)
+        x[:, t0:t0 + T, :] = 0
+        return x
+
+
     def forward(self, x, input_length):
-        enc_state = super().forward(x, input_length)
+        encoded_features, input_length = self.subsampling(x, input_length)
+
+        y = encoded_features
+
+        x = self.masking(encoded_features)
+        context_vector = super().forward(encoded_features, input_length)
         raise NotImplementedError
 
 
