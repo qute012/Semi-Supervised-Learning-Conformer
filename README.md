@@ -2,4 +2,4 @@
 
 
 ## Requirements
-You should install before pre-training
+You should install third-parties(NCCL, Apex) for distributed training.
