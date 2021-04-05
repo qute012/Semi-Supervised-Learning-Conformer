@@ -18,6 +18,7 @@ class ConformerForPreTraining(ConformerEncoder):
             conv_expansion_factor=2,
             ffn_expansion_factor=4,
             dropout_p=0.1,
+            n_negatives=10
     ):
         super(ConformerForPreTraining, self).__init__(
             in_dim=in_dim,
@@ -33,6 +34,7 @@ class ConformerForPreTraining(ConformerEncoder):
         self.subsampling = SubSampling(in_dim, encoder_dim, dropout_p)
         self.out_proj = nn.Linear(encoder_dim, encoder_dim)
         self.quantization = nn.Linear(encoder_dim, encoder_dim)
+        self.n_negatives = n_negatives
         self.criterion = ContrastiveLoss(reduce='sum')
 
     @property
@@ -121,10 +123,13 @@ class ConformerForPreTraining(ConformerEncoder):
         encoded_features, input_length = self.subsampling(x, input_length)
 
         y = encoded_features
-
         x = self.masking(encoded_features)
+
         context_vector = super().forward(encoded_features, input_length)
-        raise NotImplementedError
+
+        negtives = self.negative_sampling(y, self.n_negatives)
+        loss = self.criterion(context_vector, y, negtives)
+        return loss, context_vector
 
 
 class ConformerCTC(nn.Module):
