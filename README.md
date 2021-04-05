@@ -1,1 +1,5 @@
-# Semi-Supervised-Learning-Conformer
+# Semi-Supervised Learning Conformer
+
+
+## Requirements
+You should install before pre-training
