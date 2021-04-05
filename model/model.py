@@ -63,15 +63,15 @@ class ConformerForPreTraining(ConformerEncoder):
         if input_length is None:
             max_seq_len = tsz
 
-            ctx_idxs = self.buffered_arange(tsz)\
-                .unsqueeze(-1)\
-                .expand(-1, n)\
+            ctx_idxs = self.buffered_arange(tsz) \
+                .unsqueeze(-1) \
+                .expand(-1, n) \
                 .flatten()
 
             neg_idxs = torch.randint(
                 low=0,
                 high=max_seq_len,
-                size=(bsz, n*tsz)
+                size=(bsz, n * tsz)
             )
 
             neg_idxs[neg_idxs >= ctx_idxs] += 1
@@ -98,25 +98,24 @@ class ConformerForPreTraining(ConformerEncoder):
 
         if n > 0:
             for i in range(1, bsz):
-                neg_idxs[i] += i*high
+                neg_idxs[i] += i * high
 
         negatives = y[neg_idxs.view(-1)]
-        negatives = negatives\
-            .view(bsz, tsz, n, fsz)\
+        negatives = negatives \
+            .view(bsz, tsz, n, fsz) \
             .permute(2, 0, 1, 3)
         return negatives
 
     def masking(self, x, F=27, T_ratio=0.05):
         bsz, tsz, fsz = x.shape
 
-        f0 = random.randint(0, fsz-F)
+        f0 = random.randint(0, fsz - F)
         x[:, :, f0:f0 + F] = 0
 
-        T = random.randint(0, int(tsz*T_ratio))
+        T = random.randint(0, int(tsz * T_ratio))
         t0 = random.randint(0, tsz - T)
         x[:, t0:t0 + T, :] = 0
         return x
-
 
     def forward(self, x, input_length):
         encoded_features, input_length = self.subsampling(x, input_length)
